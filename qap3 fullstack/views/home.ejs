@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item List</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            min-height: 100vh; /* Ensure the body takes up at least the full viewport height */
+            display: flex;
+            flex-direction: column;
+        }
+        header, footer {
+            background-color: #333;
+            color: #fff;
+            padding: 0.5rem 1rem; /* Reduced padding for smaller footer */
+            text-align: center;
+        }
+        main {
+            flex: 1; /* Allow the main content to take up remaining space */
+            padding: 1rem;
+            overflow: auto; /* Ensure scrolling if content exceeds viewport height */
+        }
+        .item-list {
+            list-style: none;
+            padding: 0;
+        }
+        .item-list li {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+            padding: 1rem;
+            position: relative;
+        }
+        .item-list button, .item-list form {
+            margin: 0.5rem;
+        }
+        form {
+            margin-bottom: 1rem;
+        }
+        #edit-form {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Item List</h1>
+    </header>
+    <main>
+        <h2>Items</h2>
+        <ul class="item-list">
+            <% items.forEach(item => { %>
+                <li>
+                    <h3><%= item.name %></h3>
+                    <p><%= item.description %></p>
+                    <p><strong>Price:</strong> $<%= item.price %></p>
+
+                    <!-- Delete Form -->
+                    <form action="/items/<%= item.id %>/delete" method="POST" style="display:inline;">
+                        <button type="submit">Delete</button>
+                    </form>
+
+                    <!-- Edit Button -->
+                    <button onclick="showEditForm(<%= item.id %>, `<%= item.name.replace(/`/g, '\\`') %>`, `<%= item.description.replace(/`/g, '\\`') %>`, <%= item.price %>)">Edit</button>
+                </li>
+            <% }) %>
+        </ul>
+
+        <!-- Add New Item Form -->
+        <h2>Add New Item</h2>
+        <form action="/items/add" method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required></textarea>
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" step="0.01" required>
+            <button type="submit">Add Item</button>
+        </form>
+
+        <!-- Edit Item Form (hidden by default) -->
+        <div id="edit-form" style="display:none;">
+            <h2>Edit Item</h2>
+            <form id="edit-form-action" method="POST">
+                <input type="hidden" id="edit-item-id" name="id">
+                <label for="edit-name">Name:</label>
+                <input type="text" id="edit-name" name="name" required>
+                <label for="edit-description">Description:</label>
+                <textarea id="edit-description" name="description" required></textarea>
+                <label for="edit-price">Price:</label>
+                <input type="number" id="edit-price" name="price" step="0.01" required>
+                <button type="submit">Update Item</button>
+                <button type="button" onclick="hideEditForm()">Cancel</button>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; <%= new Date().getFullYear() %> My Company</p>
+    </footer>
+
+    <script>
+        function showEditForm(id, name, description, price) {
+            document.getElementById('edit-item-id').value = id;
+            document.getElementById('edit-name').value = name;
+            document.getElementById('edit-description').value = description;
+            document.getElementById('edit-price').value = price;
+            document.getElementById('edit-form').style.display = 'block';
+            document.getElementById('edit-form-action').action = `/items/${id}/edit`;
+        }
+
+        function hideEditForm() {
+            document.getElementById('edit-form').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
